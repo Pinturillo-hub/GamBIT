@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2c2218">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Chess Study - Juego de lógica basado en ajedrez">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    
+    <title>Chess Study</title>
+</head>
+<body>
+    <!-- PANTALLA DE BIENVENIDA -->
+    <div id="welcome-screen" class="screen welcome-screen">
+        <div class="welcome-content">
+            <div class="welcome-icon">♚</div>
+            <h1 class="welcome-title">Chess Study</h1>
+            <p class="welcome-subtitle">Juego de Lógica</p>
+            <button id="btn-start" class="btn-start">
+                <span class="btn-start-icon">▶</span>
+                Comenzar
+            </button>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE JUEGO -->
+    <div id="game-screen" class="screen game-screen hidden">
+        <!-- Zona superior: Controles de tablero -->
+        <div class="controls-top">
+            <button class="control-btn" id="btn-rotate-left" title="Girar izquierda">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 4v6h6M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                </svg>
+            </button>
+            <button class="control-btn" id="btn-mirror-v" title="Espejo vertical">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: rotate(90deg)">
+                    <path d="M4 12h16M8 8l-4 4 4 4M16 8l4-4-4 4"/>
+                </svg>
+            </button>
+            <button class="control-btn" id="btn-mirror-h" title="Espejo horizontal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 12h16M8 8l-4 4 4 4M16 8l4-4-4 4"/>
+                </svg>
+            </button>
+            <button class="control-btn" id="btn-rotate-right" title="Girar derecha">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 4v6h-6M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Zona media: Tablero -->
+        <div class="middle-zone">
+            <div class="board" id="board">
+                <div class="cell" data-row="0" data-col="0"></div>
+                <div class="cell" data-row="0" data-col="1"></div>
+                <div class="cell" data-row="0" data-col="2"></div>
+                <div class="cell" data-row="1" data-col="0"></div>
+                <div class="cell" data-row="1" data-col="1"></div>
+                <div class="cell" data-row="1" data-col="2"></div>
+                <div class="cell" data-row="2" data-col="0"></div>
+                <div class="cell" data-row="2" data-col="1"></div>
+                <div class="cell" data-row="2" data-col="2"></div>
+            </div>
+        </div>
+
+        <!-- Overlay de tiempo agotado -->
+        <div id="time-overlay" class="time-overlay hidden">
+            <div class="time-overlay-content">
+                <span class="time-overlay-text">¡Tiempo!</span>
+            </div>
+        </div>
+
+        <!-- Zona inferior: Panel de control -->
+        <div class="controls-bottom">
+            <button class="btn-clock" id="btn-clock">
+                <span id="clock-icon" class="clock-icon">⏳</span>
+                <span id="clock-text" class="clock-text hidden">01:00</span>
+            </button>
+            <button class="btn-next" id="btn-next">
+                Siguiente →
+            </button>
+        </div>
+    </div>
+    
+    <script src="app.js" defer></script>
+</body>
+</html>
