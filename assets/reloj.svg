@@ -1,0 +1,6 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+	<style>
+		.s0 { opacity: .98;fill: #020202 } 
+	</style>
+	<path id="Path 0" fill-rule="evenodd" class="s0" d="m36 18l4-8 8-4h159l11 8 1 12-57 98-1 6 58 100-1 13-9 8h-163l-10-12v-7l59-103-59-104zm76 111l-61 107h153l-61-107 61-108h-152zm-8-46l46 2-23 38zm23 50l50 87h-99z"/>
+</svg>

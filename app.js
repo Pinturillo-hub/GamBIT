@@ -6,11 +6,11 @@
 // ==================== DEFINICIÓN DE PIEZAS ====================
 
 const PIEZAS = [
-    { nombre: 'Rey', simbolo: '♚' },
-    { nombre: 'Dama', simbolo: '♛' },
-    { nombre: 'Torre', simbolo: '♜' },
-    { nombre: 'Alfil', simbolo: '♝' },
-    { nombre: 'Caballo', simbolo: '♞' }
+    { nombre: 'Rey', archivo: 'assets/rey.svg' },
+    { nombre: 'Dama', archivo: 'assets/dama.svg' },
+    { nombre: 'Torre', archivo: 'assets/torre.svg' },
+    { nombre: 'Alfil', archivo: 'assets/alfil.svg' },
+    { nombre: 'Caballo', archivo: 'assets/caballo.svg' }
 ];
 
 // ==================== ESTADO DEL JUEGO ====================
@@ -53,7 +53,7 @@ function generarTarjeta() {
         const pos = posiciones[i];
         const fila = Math.floor(pos / 3);
         const col = pos % 3;
-        board[fila][col] = PIEZAS[i].simbolo;
+        board[fila][col] = PIEZAS[i].archivo;
     }
 
     renderBoard();
@@ -84,6 +84,15 @@ function showGameScreen() {
     welcomeScreen.classList.add('hidden');
     gameScreen.classList.remove('hidden');
     generarTarjeta();
+
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const el = document.documentElement;
+        if (el.requestFullscreen) {
+            el.requestFullscreen().catch(() => {});
+        } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+        }
+    }
 }
 
 // ==================== RENDERIZADO DEL TABLERO ====================
@@ -92,7 +101,12 @@ function renderBoard() {
     cells.forEach(cell => {
         const row = parseInt(cell.dataset.row);
         const col = parseInt(cell.dataset.col);
-        cell.textContent = board[row][col] || '';
+        const piece = board[row][col];
+        if (piece) {
+            cell.innerHTML = '<img class="piece" src="' + piece + '" alt="" draggable="false">';
+        } else {
+            cell.innerHTML = '';
+        }
     });
 }
 
@@ -103,22 +117,33 @@ function renderBoard() {
  * @param {string} animationClass - Clase CSS de animación
  * @param {Function} transformFn - Función que transforma el board
  */
-function animateBoard(animationClass, transformFn) {
+function animateBoard(inverseTransform, transformFn, counterClass) {
     if (isAnimating) return;
 
     isAnimating = true;
     setControlsDisabled(true);
 
-    boardEl.classList.add('animating', animationClass);
+    transformFn();
+    renderBoard();
 
-    boardEl.addEventListener('animationend', function handler() {
-        boardEl.removeEventListener('animationend', handler);
+    if (counterClass) {
+        boardEl.classList.add(counterClass);
+    }
 
-        transformFn();
-        renderBoard();
+    boardEl.style.transition = 'none';
+    boardEl.style.transform = inverseTransform;
+    boardEl.offsetHeight;
 
-        boardEl.classList.remove('animating', animationClass);
+    boardEl.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    boardEl.style.transform = '';
 
+    boardEl.addEventListener('transitionend', function handler(e) {
+        if (e.target !== boardEl) return;
+        boardEl.removeEventListener('transitionend', handler);
+        boardEl.style.transition = '';
+        if (counterClass) {
+            boardEl.classList.remove(counterClass);
+        }
         isAnimating = false;
         setControlsDisabled(false);
     });
@@ -135,7 +160,7 @@ function setControlsDisabled(disabled) {
 // ==================== ROTACIÓN Y ESPEJO ====================
 
 function rotateLeft() {
-    animateBoard('rotate-left', () => {
+    animateBoard('rotateZ(90deg)', () => {
         const temp = [
             [board[0][2], board[1][2], board[2][2]],
             [board[0][1], board[1][1], board[2][1]],
@@ -146,7 +171,7 @@ function rotateLeft() {
 }
 
 function rotateRight() {
-    animateBoard('rotate-right', () => {
+    animateBoard('rotateZ(-90deg)', () => {
         const temp = [
             [board[2][0], board[1][0], board[0][0]],
             [board[2][1], board[1][1], board[0][1]],
@@ -157,17 +182,17 @@ function rotateRight() {
 }
 
 function mirrorHorizontal() {
-    animateBoard('flip-horizontal', () => {
+    animateBoard('rotateY(180deg)', () => {
         const temp = board.map(row => [...row].reverse());
         copyBoard(temp);
-    });
+    }, 'flip-h');
 }
 
 function mirrorVertical() {
-    animateBoard('flip-vertical', () => {
+    animateBoard('rotateX(180deg)', () => {
         const temp = board.map(row => [...row]).reverse();
         copyBoard(temp);
-    });
+    }, 'flip-v');
 }
 
 function copyBoard(source) {
@@ -249,7 +274,28 @@ btnMirrorV.addEventListener('click', mirrorVertical);
 btnClock.addEventListener('click', toggleClock);
 
 btnNext.addEventListener('click', () => {
+    if (isAnimating) return;
+    isAnimating = true;
+    setControlsDisabled(true);
+
+    const clone = boardEl.cloneNode(true);
+    clone.classList.add('board-clone');
+    clone.removeAttribute('id');
+    clone.style.cssText = '';
+    boardEl.parentElement.appendChild(clone);
+
     generarTarjeta();
+
+    clone.offsetHeight;
+    clone.classList.add('exit-left');
+
+    clone.addEventListener('transitionend', function handler(e) {
+        if (e.target !== clone) return;
+        clone.removeEventListener('transitionend', handler);
+        clone.remove();
+        isAnimating = false;
+        setControlsDisabled(false);
+    });
 });
 
 // ==================== SERVICE WORKER ====================

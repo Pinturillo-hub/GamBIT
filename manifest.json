@@ -2,7 +2,7 @@
     "name": "Chess Study - Juego de Lógica",
     "short_name": "Chess Study",
     "description": "Juego de lógica basado en piezas de ajedrez",
-    "start_url": "/index.html",
+    "start_url": "./index.html",
     "display": "standalone",
     "orientation": "portrait",
     "background_color": "#2c2218",
