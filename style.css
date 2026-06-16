@@ -93,6 +93,36 @@ body {
     display: none !important;
 }
 
+/* ==================== MUTE BUTTON ==================== */
+.btn-mute {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 30;
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    padding: 8px;
+    line-height: 0;
+    text-shadow:
+        -1.5px 0 rgba(255, 0, 0, 0.35),
+        1.5px 0 rgba(0, 200, 255, 0.35);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-mute .icon-sound-off {
+    display: none;
+}
+
+.btn-mute.muted .icon-sound-on {
+    display: none;
+}
+
+.btn-mute.muted .icon-sound-off {
+    display: block;
+}
+
 /* ==================== CRT SCREENS ==================== */
 .screen {
     width: 100%;

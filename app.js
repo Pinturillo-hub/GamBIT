@@ -26,6 +26,78 @@ const CONFIG = {
     CLONE_EXIT_DURATION: 350,
 };
 
+// ==================== SOUND ====================
+
+const Sound = (() => {
+    const paths = {
+        music:   'assets/sounds/music.mp3',
+        clock:   'assets/sounds/clock.mp3',
+        timeout: 'assets/sounds/timeout.mp3',
+        flip:    'assets/sounds/flip.mp3',
+        rotate:  'assets/sounds/rotate.mp3',
+    };
+
+    let musicEl = null;
+    let musicTimer = null;
+
+    function play(name) {
+        const a = new Audio(paths[name]);
+        a.volume = 1;
+        a.play().catch(() => {});
+    }
+
+    function playMusic(vol) {
+        if (!musicEl) {
+            musicEl = new Audio(paths.music);
+            musicEl.loop = true;
+        }
+        musicEl.volume = vol ?? 0.3;
+        musicEl.currentTime = 0;
+        musicEl.play().catch(() => {});
+    }
+
+    function setMusicVolume(vol) {
+        if (musicEl) musicEl.volume = vol;
+    }
+
+    function stopMusic() {
+        if (musicEl) {
+            musicEl.pause();
+            musicEl.currentTime = 0;
+        }
+    }
+
+    function startWelcomeMusic() {
+        musicTimer = setTimeout(() => playMusic(0.1), 3000);
+    }
+
+    function onGameStart() {
+        clearTimeout(musicTimer);
+        musicTimer = null;
+        if (musicEl) {
+            musicEl.volume = 0.3;
+        } else {
+            playMusic(0.3);
+        }
+    }
+
+    let isMuted = false;
+    let lastVolume = 0.3;
+
+    function toggleMute() {
+        isMuted = !isMuted;
+        if (isMuted) {
+            lastVolume = musicEl ? musicEl.volume : 0.3;
+            stopMusic();
+        } else {
+            playMusic(lastVolume);
+        }
+        return isMuted;
+    }
+
+    return { play, playMusic, setMusicVolume, stopMusic, startWelcomeMusic, onGameStart, toggleMute };
+})();
+
 // ==================== STATE ====================
 
 const state = {
@@ -56,6 +128,7 @@ const dom = {
     clockIcon: document.getElementById('clock-icon'),
     clockText: document.getElementById('clock-text'),
     btnNext: document.getElementById('btn-next'),
+    btnMute: document.getElementById('btn-mute'),
     timeOverlay: document.getElementById('time-overlay'),
     controlButtons: null,
 };
@@ -213,14 +286,17 @@ function animateFlip(inverseTransform, transformFn, counterClass) {
 // ==================== ROTATION & MIRROR ====================
 
 function rotateLeft() {
+    Sound.play('rotate');
     animateRotation(state.boardRotation - CONFIG.ROTATION_STEP);
 }
 
 function rotateRight() {
+    Sound.play('rotate');
     animateRotation(state.boardRotation + CONFIG.ROTATION_STEP);
 }
 
 function mirrorHorizontal() {
+    Sound.play('flip');
     animateFlip('rotateY(180deg)', () => {
         const temp = state.board.map(row => [...row].reverse());
         copyBoard(temp);
@@ -228,6 +304,7 @@ function mirrorHorizontal() {
 }
 
 function mirrorVertical() {
+    Sound.play('flip');
     animateFlip('rotateX(180deg)', () => {
         const temp = [...state.board].reverse().map(row => [...row]);
         copyBoard(temp);
@@ -237,6 +314,7 @@ function mirrorVertical() {
 // ==================== TIMER ====================
 
 function toggleClock() {
+    Sound.play('clock');
     if (state.isClockRunning) {
         stopClock();
     } else {
@@ -267,6 +345,7 @@ function startClock() {
 
         if (state.timeRemaining <= 0) {
             stopClock();
+            Sound.play('timeout');
             dom.btnClock.classList.remove('running');
             dom.btnClock.classList.add('time-out');
             showTimeOverlay();
@@ -295,6 +374,8 @@ function showTimeOverlay() {
 // ==================== SCREEN NAVIGATION ====================
 
 function showGameScreen() {
+    Sound.play('flip');
+    Sound.onGameStart();
     dom.welcomeScreen.classList.add('hidden');
     dom.gameScreen.classList.remove('hidden');
     generateCard();
@@ -310,6 +391,7 @@ function showGameScreen() {
 
 function handleNext() {
     if (state.isAnimating) return;
+    Sound.play('flip');
     state.isAnimating = true;
     setControlsDisabled(true);
 
@@ -343,6 +425,11 @@ const handler = (e) => {
 
 // ==================== EVENT BINDING ====================
 
+function toggleMute() {
+    const muted = Sound.toggleMute();
+    dom.btnMute.classList.toggle('muted', muted);
+}
+
 function bindEvents() {
     dom.btnStart.addEventListener('click', showGameScreen);
     dom.btnRotateLeft.addEventListener('click', rotateLeft);
@@ -351,6 +438,7 @@ function bindEvents() {
     dom.btnMirrorV.addEventListener('click', mirrorVertical);
     dom.btnClock.addEventListener('click', toggleClock);
     dom.btnNext.addEventListener('click', handleNext);
+    dom.btnMute.addEventListener('click', toggleMute);
 }
 
 // ==================== SERVICE WORKER ====================
@@ -367,3 +455,4 @@ function registerServiceWorker() {
 
 bindEvents();
 registerServiceWorker();
+Sound.startWelcomeMusic();
