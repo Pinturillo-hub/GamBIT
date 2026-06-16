@@ -34,7 +34,7 @@
     /* Layout */
     --board-max: 320px;
     --board-radius: 20px;
-    --btn-radius: 16px;
+    --btn-radius: 50px;
 }
 
 /* color-mix support — overrides fallback values */
@@ -104,30 +104,30 @@ body {
     overflow: hidden;
 }
 
-/* Vignette */
-.screen::before {
+/* Aseguramos que los efectos CRT estén por encima de toda la app */
+.screen::before, .screen::after {
     content: '';
-    position: absolute;
+    position: fixed; /* Se ancla a la pantalla del móvil, no al contenido */
     inset: 0;
-    background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.85) 100%);
     pointer-events: none;
-    z-index: 20;
+    z-index: 9999; /* Forzamos máxima prioridad */
 }
 
-/* Scanlines */
+/* Viñeta simétrica (Efecto Tubo) */
+.screen::before {
+    /* Usamos circle para que oscurezca las 4 esquinas por igual */
+    background: radial-gradient(circle at center, transparent 45%, rgba(0, 0, 0, 0.95) 120%);
+}
+
+/* Scanlines (Las dejamos como las tenías, que estaban perfectas) */
 .screen::after {
-    content: '';
-    position: absolute;
-    inset: 0;
     background: repeating-linear-gradient(
         0deg,
-        rgba(0, 0, 0, 0.3) 0px,
-        rgba(0, 0, 0, 0.3) 1px,
+        rgba(0, 0, 0, 0.2) 0px,
+        rgba(0, 0, 0, 0.2) 1px,
         transparent 1px,
         transparent 3px
     );
-    pointer-events: none;
-    z-index: 20;
 }
 
 /* ==================== WELCOME SCREEN ==================== */
@@ -234,12 +234,12 @@ body {
     height: 100%;
     border-radius: 24px;
     position: relative;
-    transform: perspective(500px) rotateX(4deg) scaleY(1.03);
-    transform-origin: center center;
+    /* Eliminamos el tilt 3D que lo descentraba todo */
+    transform: none; 
+    /* Efecto óptico de cristal curvo (abombado) */
     box-shadow:
-        inset 0 0 100px rgba(0, 0, 0, 0.7),
-        inset 0 0 200px rgba(0, 0, 0, 0.4),
-        0 0 40px rgba(0, 0, 0, 0.6);
+        inset 0 0 100px rgba(0, 0, 0, 0.9),
+        inset 0 0 40px rgba(0, 0, 0, 0.6);
     background: var(--bg-primary);
     isolation: isolate;
 }
@@ -364,6 +364,7 @@ body {
     transform-style: preserve-3d;
     position: relative;
     z-index: 1;
+    overflow: hidden;
 }
 
 /* ==================== BOARD CLONE (Next animation) ==================== */
@@ -382,6 +383,7 @@ body {
     z-index: 2;
     pointer-events: none;
     transform: translateX(0) rotateZ(0deg);
+    overflow: hidden;
 }
 
 .board-clone .cell {
@@ -583,11 +585,16 @@ body {
 /* ==================== NEXT BUTTON ==================== */
 .btn-next {
     flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
     max-width: 200px;
     height: 72px;
     padding: 0 1.5rem;
     font-family: 'NintendoNES', monospace;
-    font-size: 1.15rem;
+    font-size: 1,4rem;
     font-weight: 700;
     color: #000000;
     background: var(--accent);
