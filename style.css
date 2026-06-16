@@ -6,7 +6,7 @@
 }
 
 :root {
-    --bg-primary: #9c3421;
+    --bg-primary: hsl(var(--bg-hue), 100%, 30%);
     --bg-secondary: #000000;
     --cell-dark: #353535;
     --cell-light: #e8e8e8;
@@ -38,6 +38,21 @@ html, body {
 
 body {
     font-family: 'NintendoNES', monospace;
+}
+
+@property --bg-hue {
+    syntax: '<number>';
+    initial-value: 0;
+    inherits: true;
+}
+
+html {
+    animation: hue-shift 180s linear infinite;
+}
+
+@keyframes hue-shift {
+    0% { --bg-hue: 0; }
+    100% { --bg-hue: 360; }
 }
 
 .hidden {
@@ -514,7 +529,7 @@ body {
     justify-content: center;
 }
 
-.clock-icon img {
+.clock-icon svg {
     width: 2rem;
     height: 2rem;
     color: var(--bg-primary);
